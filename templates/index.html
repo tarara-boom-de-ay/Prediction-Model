@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification Fortune Teller</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg bg-white sticky-top" style="border-bottom: 2px solid yellow;">
+        <div class="container-fluid">
+          <a class="navbar-brand text-dark" href="#"><b>Fortune Teller Module</b></a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="d-flex justify-content-center"> <!-- Use d-flex and justify-content-center classes to center nav-links -->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active " aria-current="page" href="{{ url_for('Index') }}"><b>Classification</b></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link " href="{{ url_for('Index2') }}"><b>Regression</b></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+          </div>
+        </div>
+      </nav>
+      <!-- navigation END -->
+
+      <div class="container">
+        <div class="card border-warning mt-5">
+            <div class="card-header text-bg-warning">
+                <h5 class="card-title">Gender Classification Prediction</h5>
+            </div>
+            <div class="card-body">
+                <!-- Card Content -->
+                <form id="classification_predict">
+                    <div class="row">
+                        <!-- Long Hair -->
+                        <div class="col">
+                            <select id="long_hair" class="form-control">
+                                <option value="1">Long Hair</option>
+                                <option value="0">Short Hair</option>
+                            </select>
+                        </div>
+                        <!-- Forehead Width -->
+                        <div class="col">
+                            <input id="forehead_w" type="text" class="form-control" placeholder="Forehead Width (cm)" aria-label="forehead_w">
+                        </div>
+                    </div>
+    
+                    <div class="row mt-3">
+                        <!-- Forehead Height -->
+                        <div class="col">
+                            <input id="forehead_h" type="text" class="form-control" placeholder="Forehead Height (cm)" aria-label="forehead_h">
+                        </div>
+                        <!-- Nose Wide -->
+                        <div class="col">
+                            <select id="nose_wide" class="form-control">
+                                <option value="1">Wide Nose</option>
+                                <option value="0">Thin Nose</option>
+                            </select>
+                        </div>
+                    </div>
+    
+                    <div class="row mt-3">
+                        <!-- Nose Long -->
+                        <div class="col">
+                            <select id="nose_long" class="form-control">
+                                <option value="1">Long Nose</option>
+                                <option value="0">Short Nose</option>
+                            </select>
+                        </div>
+                        <!-- Lips Thin -->
+                        <div class="col">
+                            <select id="lips_thin" class="form-control">
+                                <option value="1">Thin Lips</option>
+                                <option value="0">Wide Lips</option>
+                            </select>
+                        </div>
+                    </div>
+    
+                    <div class="row mt-3">
+                        <!-- Nose to Lip Distance -->
+                        <div class="col">
+                            <select id="nose_to_lip" class="form-control">
+                                <option value="1">Long Distance Between Lip and Nose</option>
+                                <option value="0">Short Distance Between Lip and Nose</option>
+                            </select>
+                        </div>
+                    </div>
+    
+                    <button type="button" class="btn btn-warning mt-3" onclick="predict()">Predict</button>
+                </form>
+                <!-- Card content end -->
+                <!-- Flourish card -->
+                <div class="card border-warning mt-5">
+                    <div class="card-header">
+                        Data Visualization
+                    </div>
+                    <div class="flourish-embed flourish-radar" data-src="visualisation/16139167"><script src="https://public.flourish.studio/resources/embed.js"></script></div>
+                    </div>
+                </div>
+        <!-- Flourish card END -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function predict() {
+            // Collect form data
+            var formData = {
+                'long_hair': document.getElementById('long_hair').value,
+                'forehead_w': document.getElementById('forehead_w').value,
+                'forehead_h': document.getElementById('forehead_h').value,
+                'nose_wide': document.getElementById('nose_wide').value,
+                'nose_long': document.getElementById('nose_long').value,
+                'lips_thin': document.getElementById('lips_thin').value,
+                'nose_to_lip': document.getElementById('nose_to_lip').value,
+            };
+    
+            // Store placeholder values
+            var placeholderValues = {
+                'long_hair': document.getElementById('long_hair').placeholder,
+                'forehead_w': document.getElementById('forehead_w').placeholder,
+                'forehead_h': document.getElementById('forehead_h').placeholder,
+                'nose_wide': document.getElementById('nose_wide').placeholder,
+                'nose_long': document.getElementById('nose_long').placeholder,
+                'lips_thin': document.getElementById('lips_thin').placeholder,
+                'nose_to_lip': document.getElementById('nose_to_lip').placeholder,
+            };
+    
+            // Send form data to Flask app
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the prediction result here
+                var predictionResult = data.prediction === 1 ? "It's a BOY!" : "It's a GIRL!";
+    
+                // Display the result using SweetAlert2
+                Swal.fire({
+            title: 'Prediction Result',
+            text: 'Congratulations, ' + predictionResult,
+            icon: 'success',
+        }).then(() => {
+            // Reload the page after the user clicks "OK"
+            location.reload();
+        });
+    
+    
+                // Restore placeholder values
+                document.getElementById('long_hair').placeholder = placeholderValues.long_hair;
+                document.getElementById('forehead_w').placeholder = placeholderValues.forehead_w;
+                document.getElementById('forehead_h').placeholder = placeholderValues.forehead_h;
+                document.getElementById('nose_wide').placeholder = placeholderValues.nose_wide;
+                document.getElementById('nose_long').placeholder = placeholderValues.nose_long;
+                document.getElementById('lips_thin').placeholder = placeholderValues.lips_thin;
+                document.getElementById('nose_to_lip').placeholder = placeholderValues.nose_to_lip;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+    
+    
+    
+      
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+</body>
+</html>
